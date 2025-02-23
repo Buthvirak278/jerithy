@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ចែរិទ្ធ លក់អីវ៉ានចាប់ហួយ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .back-btn {
+            text-transform: uppercase;
+            font-size: 20px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .logo {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-transform: uppercase;
+            font-size: 24px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .cart-btn {
+            background-color: #120501;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .cart-btn:hover {
+            background-color: #d63c00;
+        }
+
+        .basket-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+
+        .product {
+            background-color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .product a:hover {
+            color: #ff4500;
+        }
+
+        .product img {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+        }
+
+        .price {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .time {
+            font-size: 16px;
+        }
+
+        .buy-btn {
+            background-color: #1317ff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .buy-btn:hover {
+            background-color: #1317ff;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #120501;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background-color: #d63c00;
+        }
+
+        .basket-wrapper {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            display: none;
+            overflow-y: auto;
+        }
+
+        .basket-wrapper.open {
+            display: block;
+        }
+
+        .close-btn {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .quantity-controls button {
+            margin: 0 5px;
+        }
+
+        .item-price {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Styles for action buttons in basket */
+        .actions button {
+            background-color: #120501;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .actions button:hover {
+            background-color: #d63c00;
+        }
+
+        .actions button:active {
+            background-color: #ff4500;
+        }
+        
+
+    </style>
+</head>
+<body>
+
+<header>
+  
+    <div class="time" id="current-time"></div>
+    <a href="#" class="logo">គ្រឿងស្ល</a>
+    <button class="cart-btn" onclick="toggleBasket()">Cart <span class="basket-count" id="basket-count">0</span></button>
+</header>
+
+<div class="products">
+    <div class="product">
+      
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZOMnb-olZJ5ZAWVI8lzl9_qRlhU9TPYa34g&s" alt="ផ្សិតក្រៀម 1g">
+            <h3>ផ្សិតក្រៀម 1g</h3>
+        </a>
+        <p class="price">$1.75 </p>
+        <button class="buy-btn" onclick="addToCart('ផ្សិតក្រៀម', 1.75, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZOMnb-olZJ5ZAWVI8lzl9_qRlhU9TPYa34g&s')">Add to Cart</button>
+    </div>
+    <div class="product">
+      
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsSBEUPLQ17oAElVG3Q4XiQ6myaNqQeL0fgbgt7J37JfKWyMsN0_4yZjyNBgpqKB9pxeI&usqp=CAU" alt="ខ្ទឹមស 1kg​">
+        <h3>ខ្ទឹមស 1kg​</h3>
+    </a>
+    <p class="price">$1.80 </p>
+    <button class="buy-btn" onclick="addToCart('ខ្ទឹមស 1kg​', 1.80, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsSBEUPLQ17oAElVG3Q4XiQ6myaNqQeL0fgbgt7J37JfKWyMsN0_4yZjyNBgpqKB9pxeI&usqp=CAU')">Add to Cart</button>
+</div>
+<div class="product">
+      
+    <img src="https://camhappymart.com/storage/app/public/product/1616421905NXehgvXf.jpg" alt="ខ្ទឹមក្រហមខ្មែរ 1kg​​​">
+    <h3>ខ្ទឹមក្រហមខ្មែរ 1kg​</h3>
+</a>
+<p class="price">$3.00 </p>
+<button class="buy-btn" onclick="addToCart('ខ្ទឹមក្រហមខ្មែរ 1kg​', 3.00, 'https://camhappymart.com/storage/app/public/product/1616421905NXehgvXf.jpg')">Add to Cart</button>
+</div>
+<div class="product">
+      
+    <img src="https://tokke.kesspay.io/storage/product/4927/MfVHAhbpeNlBElsH5TrZXhjXCItaNRIqgcqwmPGQ.jpeg" alt="ខ្ទឹមក្រហម 1kg​​​">
+    <h3>ខ្ទឹមក្រហម 1kg​</h3>
+</a>
+<p class="price">$1.20 </p>
+<button class="buy-btn" onclick="addToCart('ខ្ទឹមក្រហម 1kg​', 1.20, 'https://tokke.kesspay.io/storage/product/4927/MfVHAhbpeNlBElsH5TrZXhjXCItaNRIqgcqwmPGQ.jpeg')">Add to Cart</button>
+</div>
+    
+
+    <div class="product">
+    
+            <img src="https://tokke.kesspay.io/cache/large/product/44286/2cf39b4dfa8eb4a88d3fb9d617696feed1e2ee9b.jpeg" alt="យាហឺ 1g">
+            <h3>យាហឺ 1g</h3>
+        </a>
+        <p class="price">$2.50</p>
+        <button class="buy-btn" onclick="addToCart('យាហឺ 1g', 2.50, 'https://tokke.kesspay.io/cache/large/product/44286/2cf39b4dfa8eb4a88d3fb9d617696feed1e2ee9b.jpeg')">Add to Cart</button>
+    </div>
+    <div class="product">
+    
+        <img src="https://media.makrocambodiaclick.com/PRODUCT_1609725661875.jpeg" alt="បង្កា 1g">
+        <h3>បង្កា 1g</h3>
+    </a>
+    <p class="price">$2.50</p>
+    <button class="buy-btn" onclick="addToCart('បង្កា 1g', 2.50, 'https://media.makrocambodiaclick.com/PRODUCT_1609725661875.jpeg')">Add to Cart</button>
+</div>
+    <div class="product">
+        
+            <img src="https://tokke.kesspay.io/cache/large/product/47560/3050b14a3b107c63df1492f0f2e2702b6847f33c.jpg" alt="ជីឆាយ">
+            <h3>ជីឆាយ</h3>
+        </a>
+        <p class="price">$0.70</p>
+        <button class="buy-btn" onclick="addToCart('ជីឆាយ', 0.70, 'https://tokke.kesspay.io/cache/large/product/47560/3050b14a3b107c63df1492f0f2e2702b6847f33c.jpg')">Add to Cart</button>
+    </div>
+
+    <div class="product">
+    
+            <img src="https://tokke.kesspay.io/cache/large/product/44272/7a3edd17af2535b5e7d001cb3743358a2d564311.jpg" alt="ម្ទេសឆ្អើរថៃ">
+            <h3>ម្ទេសឆ្អើរថៃ</h3>
+        </a>
+        <p class="price">$0.80</p>
+        <button class="buy-btn" onclick="addToCart('ម្ទេសឆ្អើរថៃ', 0.80, 'https://commongrains.com/wp-content/uploads/2023/01/Is-Rice-A-Grain-Or-Seed.jpg')">Add to Cart</button>
+    </div>
+    
+
+
+
+
+<div class="product">
+    
+    <img src="https://tokke.kesspay.io/cache/large/product/44297/2afba8547fdce4a3b5408a000c2c6029f74a3c80.jpg" alt="មីលឿងស្ងួត1kg">
+    <h3>មីលឿងស្ងួត1kg</h3>
+</a>
+<p class="price">$2.00</p>
+<button class="buy-btn" onclick="addToCart('មីលឿងស្ងួត1kg', 2.00, 'https://tokke.kesspay.io/cache/large/product/44297/2afba8547fdce4a3b5408a000c2c6029f74a3c80.jpg')">Add to Cart</button>
+</div>
+
+
+
+
+<div class="product">
+    
+    <img src="https://ecoapp.asia/image/cache/catalog/Seller_532/49-20230912190042.%20%E1%9E%96%E1%9E%96%E1%9E%BB%E1%9F%87%E1%9E%9F%E1%9E%8E%E1%9F%92%E1%9E%8A%E1%9F%82%E1%9E%80-530x530.jpg" alt="ពពុះសណ្តែក បំពង់">
+    <h3>ពពុះសណ្តែក បំពង់ 1g</h3>
+</a>
+<p class="price">$1.25</p>
+<button class="buy-btn" onclick="addToCart('ពពុះសណ្តែក បំពង់', 1.25, 'https://ecoapp.asia/image/cache/catalog/Seller_532/49-20230912190042.%20%E1%9E%96%E1%9E%96%E1%9E%BB%E1%9F%87%E1%9E%9F%E1%9E%8E%E1%9F%92%E1%9E%8A%E1%9F%82%E1%9E%80-530x530.jpg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://ecoapp.asia/image/cache/catalog/Seller_532/49-20230912190042.%20%E1%9E%96%E1%9E%96%E1%9E%BB%E1%9F%87%E1%9E%9F%E1%9E%8E%E1%9F%92%E1%9E%8A%E1%9F%82%E1%9E%80-530x530.jpg" alt="ពពុះសណ្តែក មូល">
+    <h3>ពពុះសណ្តែក មូល 1g</h3>
+</a>
+<p class="price">$1.25</p>
+<button class="buy-btn" onclick="addToCart('ពពុះសណ្តែក មូល', 1.25, 'https://ecoapp.asia/image/cache/catalog/Seller_532/49-20230912190042.%20%E1%9E%96%E1%9E%96%E1%9E%BB%E1%9F%87%E1%9E%9F%E1%9E%8E%E1%9F%92%E1%9E%8A%E1%9F%82%E1%9E%80-530x530.jpg')">Add to Cart</button>
+</div>
+
+
+
+
+</div>
+
+
+</div>
+
+
+<div class="pagination">
+    <button onclick="location.href='index គ្រឿងទេស.html'">1</button>
+    <button onclick="location.href='index ម្សៅស៊ុប.html'">2</button>
+    <button onclick="location.href='index ប៊ីចេង.html'">3</button>
+    <button onclick="location.href='index គ្រឿងស្ល.html'">4</button>
+    <button onclick="location.href='index ដប​.html'">5</button>
+    <button onclick="location.href='index កញ្ចប់.html'">6</button>
+</div>
+<a href="index 1.html" class="back-button"><strong>BACK</strong></a>
+
+<style>
+  .back-button {
+    text-decoration: none; 
+    color: black; 
+  }
+</style>
+<!-- Basket -->
+<div class="basket-wrapper" id="basketWrapper">
+    <button class="close-btn" onclick="toggleBasket()">Close</button>
+    <h3>Shopping Cart</h3>
+    <div id="basketItems"></div>
+    <div id="totalPrice" class="total-price">Total: $0.00</div>
+    <div class="actions">
+        <button onclick="checkout()">Checkout</button>
+        
+    </div>
+</div>
+
+<script>
+    // Toggle Basket
+    function toggleBasket() {
+        const basket = document.getElementById('basketWrapper');
+        basket.classList.toggle('open');
+        displayBasket();
+    }
+
+    // Add product to cart
+    function addToCart(productName, price, img) {
+        const item = {
+            name: productName,
+            price: price,
+            img: img,
+            quantity: 1
+        };
+
+        let cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const existingItem = cart.find(i => i.name === item.name);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push(item);
+        }
+
+        localStorage.setItem('basket', JSON.stringify(cart));
+        alert(`${productName} added to cart!`);
+        updateBasketCount();
+    }
+
+    // Update cart item count in the basket icon
+    function updateBasketCount() {
+        const cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const basketCount = document.getElementById('basket-count');
+        basketCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Display basket items and total price
+    function displayBasket() {
+        const basket = JSON.parse(localStorage.getItem('basket')) || [];
+        const basketItems = document.getElementById('basketItems');
+        const totalPrice = document.getElementById('totalPrice');
+        basketItems.innerHTML = '';
+        let total = 0;
+
+        if (basket.length === 0) {
+            basketItems.innerHTML = '<div class="empty-message">Your cart is empty!</div>';
+            totalPrice.innerHTML = 'Total: $0.00';
+            return;
+        }
+
+        basket.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+
+            const itemContent = `
+                <img src="${item.img}" alt="${item.name}">
+                <div class="item-details">
+                    <span class="item-name">${item.name}</span>
+                    <div class="quantity-controls">
+                        <button onclick="updateQuantity(${index}, 'decrease')">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${index}, 'increase')">+</button>
+                    </div>
+                </div>
+                <div class="item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+            `;
+            itemDiv.innerHTML = itemContent;
+            basketItems.appendChild(itemDiv);
+
+            total += item.price * item.quantity;
+        });
+
+        totalPrice.innerHTML = `Total: $${total.toFixed(2)}`;
+    }
+
+    // Update item quantity in the basket
+    function updateQuantity(index, action) {
+        const cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const item = cart[index];
+
+        if (action === 'increase') {
+            item.quantity += 1;
+        } else if (action === 'decrease') {
+            item.quantity -= 1;
+        }
+
+        if (item.quantity <= 0) {
+            cart.splice(index, 1);
+        }
+
+        localStorage.setItem('basket', JSON.stringify(cart));
+        displayBasket();
+        updateBasketCount();
+    }
+
+    
+    function checkout() {
+        window.location.href = 'checkout.html'; 
+    }
+    function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0'); 
+            const minutes = now.getMinutes().toString().padStart(2, '0'); 
+            const seconds = now.getSeconds().toString().padStart(2, '0'); 
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+   
+</script>
+
+</body>
+</html>

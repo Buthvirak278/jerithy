@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ចែរិទ្ធ លក់អីវ៉ានចាប់ហួយ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .back-btn {
+            text-transform: uppercase;
+            font-size: 20px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .logo {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-transform: uppercase;
+            font-size: 24px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .cart-btn {
+            background-color: #120501;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .cart-btn:hover {
+            background-color: #d63c00;
+        }
+
+        .basket-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+
+        .product {
+            background-color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .product a:hover {
+            color: #ff4500;
+        }
+
+        .product img {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+        }
+
+        .price {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .time {
+            font-size: 16px;
+        }
+
+        .buy-btn {
+            background-color: #1317ff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .buy-btn:hover {
+            background-color: #1317ff;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #120501;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background-color: #d63c00;
+        }
+
+        .basket-wrapper {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            display: none;
+            overflow-y: auto;
+        }
+
+        .basket-wrapper.open {
+            display: block;
+        }
+
+        .close-btn {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .quantity-controls button {
+            margin: 0 5px;
+        }
+
+        .item-price {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Styles for action buttons in basket */
+        .actions button {
+            background-color: #120501;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .actions button:hover {
+            background-color: #d63c00;
+        }
+
+        .actions button:active {
+            background-color: #ff4500;
+        }
+        
+
+    </style>
+</head>
+<body>
+
+<header>
+  
+    <div class="time" id="current-time"></div>
+    <a href="#" class="logo">មីកញ្ចប់</a>
+    <button class="cart-btn" onclick="toggleBasket()">Cart <span class="basket-count" id="basket-count">0</span></button>
+</header>
+
+<div class="products">
+    <div class="product">
+      
+        <img src="https://images.khmer24.co/24-11-27/s---289724173266897721138478-c.jpg" alt="មីខ្លាឃ្មុំក្រហមកញ្ចប់​ 1កេស">
+        <h3>មីខ្លាឃ្មុំក្រហមកញ្ចប់​ 1កេស</h3>
+    </a>
+    <p class="price">$6.50</p>
+    <button class="buy-btn" onclick="addToCart('មីខ្លាឃ្មុំក្រហមកញ្ចប់​ 1កេស', 6.50, 'https://images.khmer24.co/24-11-27/s---289724173266897721138478-c.jpg')">Add to Cart</button>
+</div>
+   
+   
+   
+
+    <div class="product">
+    
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxr4xUA7ghz8mNCQialCLiuiCJBNErWDghegTry5Rf-E5yQ0OEO1gEujfFD8WLZFy3qf0&usqp=CAU" alt="មី ម៉ាម៉ាសាច់ជ្រូក 1កេស">
+            <h3>មី ម៉ាម៉ាសាច់ជ្រូក 1កេស</h3>
+        </a>
+        <p class="price">$8.00</p>
+        <button class="buy-btn" onclick="addToCart('អមី ម៉ាម៉ាសាច់ជ្រូក 1កេសិះ', 8.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxr4xUA7ghz8mNCQialCLiuiCJBNErWDghegTry5Rf-E5yQ0OEO1gEujfFD8WLZFy3qf0&usqp=CAU')">Add to Cart</button>
+    </div>
+   
+    <div class="product">
+    
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTecJrF0bqYXPrhBIJgogMkOPZbvcaR_rpy1uW5C4T-EnuQv5523S7-BBYsja5VQWwoLkc&usqp=CAU" alt="មី ម៉ាម៉ាហិល  1កេស">
+            <h3>មី ម៉ាម៉ាហិល  1កេស</h3>
+        </a>
+        <p class="price">$8.00</p>
+        <button class="buy-btn" onclick="addToCart('មី ម៉ាម៉ាហិល  1កេស', 8.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTecJrF0bqYXPrhBIJgogMkOPZbvcaR_rpy1uW5C4T-EnuQv5523S7-BBYsja5VQWwoLkc&usqp=CAU')">Add to Cart</button>
+    </div>
+    
+
+
+<div class="product">
+    
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9PmF6BZRvKHXDw3cSSaczbkF249El35282Ah3mMX-oF4HZdrh1T1J6S73xSUM6kSZnjU&usqp=CAU" alt="មីហិល korea black">
+    <h3>មីហិល korea Black</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល korea Black', 4.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9PmF6BZRvKHXDw3cSSaczbkF249El35282Ah3mMX-oF4HZdrh1T1J6S73xSUM6kSZnjU&usqp=CAU')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMQPf1qjr2x1uOySrF2LYa2QemFQtUQ3UjQPdztVwahAgB3jVtDCI7l5IlR3dNu1tApes&usqp=CAU" alt="មីហិល korea">
+    <h3>មីហិល korea</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល korea', 4.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMQPf1qjr2x1uOySrF2LYa2QemFQtUQ3UjQPdztVwahAgB3jVtDCI7l5IlR3dNu1tApes&usqp=CAU')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://media.makrocambodiaclick.com/PRODUCT_1700728108735.jpeg" alt="មីហិល korea RED">
+    <h3>មីហិល korea RED</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល korea RED', 4.00, 'https://media.makrocambodiaclick.com/PRODUCT_1700728108735.jpeg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQRb0u2Ky1b_6by6TlJvv57uhMYIYX8OnAoKZOqT3aoOPCFL0bhgqRbfwPrZ9POW5MvVI&usqp=CAU" alt="មីហិល korea YELLOW">
+    <h3>មីហិល korea YELLOW</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល korea YELLOW', 4.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQRb0u2Ky1b_6by6TlJvv57uhMYIYX8OnAoKZOqT3aoOPCFL0bhgqRbfwPrZ9POW5MvVI&usqp=CAU')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://img06.weeecdn.com/item/image/307/516/66332BD97F18527E.jpeg!c750x0.jpeg" alt="មីហិល korea PINK">
+    <h3>មីហិល korea PINK</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល korea PINK', 4.00, 'https://img06.weeecdn.com/item/image/307/516/66332BD97F18527E.jpeg!c750x0.jpeg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://media.makrocambodiaclick.com/PRODUCT_1709781061323.jpeg" alt="មីហិល KOEONO RED">
+    <h3>មីហិល KOEONO RED</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល KOEONO RED', 4.00, 'https://media.makrocambodiaclick.com/PRODUCT_1709781061323.jpeg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://media.makrocambodiaclick.com/PRODUCT_1709780727085.jpeg" alt="មីហិល KOEONO PORK">
+    <h3>មីហិល KOEONO PORK</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល KOEONO PORK', 4.00, 'https://media.makrocambodiaclick.com/PRODUCT_1709780727085.jpeg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://media.makrocambodiaclick.com/PRODUCT_1733032466778.jpeg" alt="មីហិល KOEONO SEAFOOD">
+    <h3>មីហិល KOEONO SEAFOOD</h3>
+</a>
+<p class="price">$4.00</p>
+<button class="buy-btn" onclick="addToCart('មីហិល KOEONO SEAFOOD', 4.00, 'https://media.makrocambodiaclick.com/PRODUCT_1733032466778.jpeg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRkyYCQ6NR3BiUgVcfjyiixc8LIbxx_kx5ffKtYB87XYox0u2rzaBqy0DRrchNMSdocZI&usqp=CAU" alt="មី Indomie 1កេស">
+    <h3>មី Indomie 1កេស </h3>
+</a>
+<p class="price">$6.00</p>
+<button class="buy-btn" onclick="addToCart('មី Indomie 1កេស', 6.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRkyYCQ6NR3BiUgVcfjyiixc8LIbxx_kx5ffKtYB87XYox0u2rzaBqy0DRrchNMSdocZI&usqp=CAU')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://api.tenbox.co/upload/image/prod/ab75f2c8-713b-42a4-9be9-dec4472c50d8.png" alt="មី Indomieហិល 1កេស">
+    <h3>មី Indomieហិល1កេស </h3>
+</a>
+<p class="price">$6.00</p>
+<button class="buy-btn" onclick="addToCart('មី Indomie​​ហិល 1កេស', 6.00, 'https://api.tenbox.co/upload/image/prod/ab75f2c8-713b-42a4-9be9-dec4472c50d8.png')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://camhappymart.com/storage/app/public/product/thumbnail/2024-07-15-6694c9a792c2c.png" alt="មីហ្គូដសាច់ជ្រូកចិញ្រាំ GOOD MINCED PORK">
+    <h3>មីហ្គូដសាច់ជ្រូកចិញ្រាំ GOOD MINCED PORK </h3>
+</a>
+<p class="price">$6.00</p>
+<button class="buy-btn" onclick="addToCart('មីហ្គូដសាច់ជ្រូកចិញ្រាំ GOOD MINCED PORK', 6.00, 'https://camhappymart.com/storage/app/public/product/thumbnail/2024-07-15-6694c9a792c2c.png')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://aeoncambodia.sgp1.digitaloceanspaces.com/image/catalog/product/8934563071011f.jpg" alt="គុយទាវភ្នំពេញ​GOOD">
+    <h3>គុយទាវភ្នំពេញ​GOOD</h3>
+</a>
+<p class="price">$6.00</p>
+<button class="buy-btn" onclick="addToCart('គុយទាវភ្នំពេញ​GOOD', 6.00, 'https://aeoncambodia.sgp1.digitaloceanspaces.com/image/catalog/product/8934563071011f.jpg')">Add to Cart</button>
+</div>
+<div class="product">
+    
+    <img src="https://assets-cdn.vtenh.com/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBOGwwQmc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--8a3b8c4767cebe7ed4152dd1c86b5c79cf4faaf4/scaled_image_picker4942908342799310353.jpg?locale=km" alt=" មីសួរ GOOD រសជាតិឆ្អឹងជំនីជ្រូក">
+    <h3>មីសួរ GOOD រសជាតិឆ្អឹងជំនីជ្រូក </h3>
+</a>
+<p class="price">$6.00</p>
+<button class="buy-btn" onclick="addToCart('មីសួរ GOOD រសជាតិឆ្អឹងជំនីជ្រូក', 6.00, 'https://assets-cdn.vtenh.com/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBOGwwQmc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--8a3b8c4767cebe7ed4152dd1c86b5c79cf4faaf4/scaled_image_picker4942908342799310353.jpg?locale=km')">Add to Cart</button>
+</div>
+
+
+</div>
+
+
+</div>
+
+
+<div class="pagination">
+    <button onclick="location.href='index មី.html'">1</button>
+
+</div>
+<a href="index 1.html" class="back-button"><strong>BACK</strong></a>
+
+<style>
+  .back-button {
+    text-decoration: none; 
+    color: black; 
+  }
+</style>
+<!-- Basket -->
+<div class="basket-wrapper" id="basketWrapper">
+    <button class="close-btn" onclick="toggleBasket()">Close</button>
+    <h3>Shopping Cart</h3>
+    <div id="basketItems"></div>
+    <div id="totalPrice" class="total-price">Total: $0.00</div>
+    <div class="actions">
+        <button onclick="checkout()">Checkout</button>
+        
+    </div>
+</div>
+
+<script>
+    // Toggle Basket
+    function toggleBasket() {
+        const basket = document.getElementById('basketWrapper');
+        basket.classList.toggle('open');
+        displayBasket();
+    }
+
+    // Add product to cart
+    function addToCart(productName, price, img) {
+        const item = {
+            name: productName,
+            price: price,
+            img: img,
+            quantity: 1
+        };
+
+        let cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const existingItem = cart.find(i => i.name === item.name);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push(item);
+        }
+
+        localStorage.setItem('basket', JSON.stringify(cart));
+        alert(`${productName} added to cart!`);
+        updateBasketCount();
+    }
+
+    // Update cart item count in the basket icon
+    function updateBasketCount() {
+        const cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const basketCount = document.getElementById('basket-count');
+        basketCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Display basket items and total price
+    function displayBasket() {
+        const basket = JSON.parse(localStorage.getItem('basket')) || [];
+        const basketItems = document.getElementById('basketItems');
+        const totalPrice = document.getElementById('totalPrice');
+        basketItems.innerHTML = '';
+        let total = 0;
+
+        if (basket.length === 0) {
+            basketItems.innerHTML = '<div class="empty-message">Your cart is empty!</div>';
+            totalPrice.innerHTML = 'Total: $0.00';
+            return;
+        }
+
+        basket.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+
+            const itemContent = `
+                <img src="${item.img}" alt="${item.name}">
+                <div class="item-details">
+                    <span class="item-name">${item.name}</span>
+                    <div class="quantity-controls">
+                        <button onclick="updateQuantity(${index}, 'decrease')">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${index}, 'increase')">+</button>
+                    </div>
+                </div>
+                <div class="item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+            `;
+            itemDiv.innerHTML = itemContent;
+            basketItems.appendChild(itemDiv);
+
+            total += item.price * item.quantity;
+        });
+
+        totalPrice.innerHTML = `Total: $${total.toFixed(2)}`;
+    }
+
+    // Update item quantity in the basket
+    function updateQuantity(index, action) {
+        const cart = JSON.parse(localStorage.getItem('basket')) || [];
+        const item = cart[index];
+
+        if (action === 'increase') {
+            item.quantity += 1;
+        } else if (action === 'decrease') {
+            item.quantity -= 1;
+        }
+
+        if (item.quantity <= 0) {
+            cart.splice(index, 1);
+        }
+
+        localStorage.setItem('basket', JSON.stringify(cart));
+        displayBasket();
+        updateBasketCount();
+    }
+
+    
+    function checkout() {
+        window.location.href = 'checkout.html'; 
+    }
+    function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0'); 
+            const minutes = now.getMinutes().toString().padStart(2, '0'); 
+            const seconds = now.getSeconds().toString().padStart(2, '0'); 
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+   
+</script>
+
+</body>
+</html>
